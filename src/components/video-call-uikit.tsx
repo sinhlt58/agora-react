@@ -9,7 +9,8 @@ import AgoraRTC, {
   NetworkQuality,
   RemoteStreamFallbackType,
 } from "agora-rtc-sdk-ng";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import AgoraUIKitCustom from "./agoraUIKitCustom";
 import { NetworkQualityComponent } from "./network-quality.component";
 import { useVideoCallContext } from "./video-call.provider";
 
@@ -31,11 +32,11 @@ export default function VideoCallUIKit() {
     appId,
     channel,
     token,
+    disableRtm: true,
     // enableDualStream: true,
     // dualStreamMode: RemoteStreamFallbackType.LOW_STREAM,
-    // enableAudio: false,
-    // enableVideo: false,
-    // disableRtm: true,
+    enableAudio: false,
+    enableVideo: false,
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -55,6 +56,19 @@ export default function VideoCallUIKit() {
       localTracks.current = tracks;
     },
   };
+
+  useEffect(() => {
+    const handleTracks = (e: any) => {
+      const tracks: any = e.detail;
+      localTracks.current = tracks;
+    };
+
+    document.addEventListener("tracks", handleTracks);
+
+    return () => {
+      document.removeEventListener("trackts", handleTracks);
+    };
+  }, []);
 
   const handleClickJoin = () => {
     setVideoCall(true);
@@ -87,7 +101,7 @@ export default function VideoCallUIKit() {
       </div>
       {videoCall && (
         <div style={{ display: "flex", width: "100%", aspectRatio: 1.5 }}>
-          <AgoraUIKit rtcProps={rtcProps} callbacks={callbacks} />
+          <AgoraUIKitCustom rtcProps={rtcProps} callbacks={callbacks} />
         </div>
       )}
     </div>

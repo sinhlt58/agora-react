@@ -62,8 +62,11 @@ export const VideoCallCustom = () => {
         // Save the remote user id for reuse.
         channelParameters.current.remoteUid = user.uid.toString();
 
-        // Set a stream fallback option to automatically switch remote video quality when network conditions degrade. 
-        agoraEngine.current.setStreamFallbackOption(channelParameters.current.remoteUid, 1);
+        // Set a stream fallback option to automatically switch remote video quality when network conditions degrade.
+        agoraEngine.current.setStreamFallbackOption(
+          channelParameters.current.remoteUid,
+          1
+        );
 
         // Specify the ID of the DIV container. You can use the uid of the remote user.
         setRemoteUserId(user.uid.toString());
@@ -90,23 +93,25 @@ export const VideoCallCustom = () => {
       });
     });
 
-    agoraEngine.current.on("connection-state-change", (curState, prevState, reason) => {
-      // The sample code uses debug console to show the connection state. In a real-world application, you can add
-      // a label or a icon to the user interface to show the connection state. 
+    agoraEngine.current.on(
+      "connection-state-change",
+      (curState, prevState, reason) => {
+        // The sample code uses debug console to show the connection state. In a real-world application, you can add
+        // a label or a icon to the user interface to show the connection state.
 
-      // Display the current connection state.
-      console.log("Connection state has changed to :" + curState);
-      // Display the previous connection state.
-      console.log("Connection state was : " + prevState);
-      // Display the connection state change reason.
-      console.log("Connection state change reason : " + reason);
-    });
+        // Display the current connection state.
+        console.log("Connection state has changed to :" + curState);
+        // Display the previous connection state.
+        console.log("Connection state was : " + prevState);
+        // Display the connection state change reason.
+        console.log("Connection state change reason : " + reason);
+      }
+    );
 
     agoraEngine.current.on("network-quality", (quality) => {
       setUplinkQuality(quality.uplinkNetworkQuality);
       setDownlinkQuality(quality.downlinkNetworkQuality);
     });
-
   }, []);
 
   const handleClickJoin = async () => {
@@ -122,7 +127,9 @@ export const VideoCallCustom = () => {
     setLocalUserId(userId.toString());
     // Create a local audio track from the audio sampled by a microphone.
     channelParameters.current.localAudioTrack =
-      await AgoraRTC.createMicrophoneAudioTrack({ encoderConfig: "high_quality_stereo" });
+      await AgoraRTC.createMicrophoneAudioTrack({
+        encoderConfig: "high_quality_stereo",
+      });
     // Create a local video track from the video captured by a camera.
     channelParameters.current.localVideoTrack =
       await AgoraRTC.createCameraVideoTrack({
@@ -155,6 +162,7 @@ export const VideoCallCustom = () => {
     // Destroy the local audio and video tracks.
     channelParameters.current.localAudioTrack?.close();
     channelParameters.current.localVideoTrack?.close();
+
     // Leave the channel
     await agoraEngine.current.leave();
 
@@ -164,39 +172,40 @@ export const VideoCallCustom = () => {
   };
 
   // Audio quality
-  const [isHighRemoteVideoQuality, setIsHighRemoteVideoQuality] = useState(false);
+  const [isHighRemoteVideoQuality, setIsHighRemoteVideoQuality] =
+    useState(false);
 
-  const handleClickAudioMixing = async () => {
+  const handleClickAudioMixing = async () => {};
 
-  }
-
-  const handleClickShowStatistics = async () => {
-
-  }
+  const handleClickShowStatistics = async () => {};
 
   const handleClickRemoteQuality = () => {
     if (!channelParameters.current.remoteUid) return;
 
     if (!isHighRemoteVideoQuality) {
-      agoraEngine.current.setRemoteVideoStreamType(channelParameters.current.remoteUid, 0);
+      agoraEngine.current.setRemoteVideoStreamType(
+        channelParameters.current.remoteUid,
+        0
+      );
       setIsHighRemoteVideoQuality(true);
     } else {
-      agoraEngine.current.setRemoteVideoStreamType(channelParameters.current.remoteUid, 1);
+      agoraEngine.current.setRemoteVideoStreamType(
+        channelParameters.current.remoteUid,
+        1
+      );
       setIsHighRemoteVideoQuality(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
-        {
-          !localUserId &&
+        {!localUserId && (
           <button className="btn-primary" onClick={handleClickJoin}>
             Join
           </button>
-        }
-        {
-          localUserId &&
+        )}
+        {localUserId && (
           <>
             <button className="btn-primary" onClick={handleClickLeave}>
               Leave
@@ -208,11 +217,15 @@ export const VideoCallCustom = () => {
                 Show statistics
               </button> */}
             <button className="btn-primary" onClick={handleClickRemoteQuality}>
-              {isHighRemoteVideoQuality && <span className="color-green-400">Remote high quality</span>}
-              {!isHighRemoteVideoQuality && <span className="color-red-400">Remote low quality</span>}
+              {isHighRemoteVideoQuality && (
+                <span className="color-green-400">Remote high quality</span>
+              )}
+              {!isHighRemoteVideoQuality && (
+                <span className="color-red-400">Remote low quality</span>
+              )}
             </button>
           </>
-        }
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -235,7 +248,10 @@ export const VideoCallCustom = () => {
         ></div>
         <div
           className="absolute top-2 right-2"
-          style={{ width: remoteUserId ? "100px" : "100%", aspectRatio: remoteUserId ? 0.8 : 1.4 }}
+          style={{
+            width: remoteUserId ? "100px" : "100%",
+            aspectRatio: remoteUserId ? 0.8 : 1.4,
+          }}
           ref={localPlayerContainer}
         ></div>
       </div>
