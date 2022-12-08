@@ -22,9 +22,9 @@ interface Props {
 }
 export function VideoCallProvider({ children }: Props) {
   const appId = "b84167854ccb4b03a50ae63bfe79fee3";
-  const channel = "demo-cross";
+  const channel = "demo5";
   const token =
-    "007eJxTYAiVupl7Rl3eIr/T7xuXvbrkF+eQzhs11jbMnZ8bmCemiSgwJFmYGJqZW5iaJCcnmSQZGCeaGiSmmhknpaWaW6alphovXNuX3BDIyOCxwIuRkQECQXwuhpTU3Hzd5KL84mIGBgAjbR80";
+    "007eJxTYDhTXiWx30B3zoeb8zLOpB5UmKV4IYCl+XZP2qVX0nZTPTcpMCRZmBiamVuYmiQnJ5kkGRgnmhokppoZJ6WlmlumpaYa70mamNwQyMgQUC7NxMgAgSA+K0NKam6+KQMDAKXEICM=";
 
   const [isUseUIKit, setIsUseUIKit] = useState(true);
 
@@ -63,7 +63,7 @@ export function VideoCallProvider({ children }: Props) {
                 <input
                   className="input-primary flex-1"
                   value={token}
-                  onChange={(_) => {}}
+                  onChange={(_) => { }}
                 />
               </div>
             </div>

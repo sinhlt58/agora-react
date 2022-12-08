@@ -1,6 +1,7 @@
 import AgoraUIKit, {
   CallbacksInterface,
   RtcPropsInterface,
+  StylePropInterface,
 } from "agora-react-uikit";
 import AgoraRTC, {
   ICameraVideoTrack,
@@ -19,7 +20,7 @@ AgoraRTC.setLogLevel(4);
 export default function VideoCallUIKit() {
   const { appId, channel, token } = useVideoCallContext();
 
-  const [videoCall, setVideoCall] = useState(false);
+  const [videoCall, setVideoCall] = useState(true);
   // network quality
   const [uplinkQuality, setUplinkQuality] = useState(0);
   const [downlinkQuality, setDownlinkQuality] = useState(0);
@@ -28,7 +29,7 @@ export default function VideoCallUIKit() {
   const localTracks = useRef<ILocalTrack[]>([]);
 
   const rtcProps: RtcPropsInterface = {
-    layout: 0,
+    layout: 1,
     appId,
     channel,
     token,
@@ -37,6 +38,40 @@ export default function VideoCallUIKit() {
     // dualStreamMode: RemoteStreamFallbackType.LOW_STREAM,
     enableAudio: false,
     enableVideo: false,
+  };
+
+  const styleProps: Partial<StylePropInterface> = {
+    UIKitContainer: {
+      position: "relative",
+    },
+    localBtnContainer: {
+      background: "",
+      position: "absolute",
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      justifyContent: "normal",
+      width: "fit-content",
+      bottom: 0,
+      left: "50%",
+      translate: "-50%"
+    },
+    pinnedVideoContainer: {
+      position: "relative",
+    },
+    scrollViewContainer: {
+      position: "absolute",
+      right: 4,
+      top: 4,
+      width: "20%",
+      aspectRatio: 0.8,
+    },
+    minViewContainer: {
+      minWidth: "100%",
+      minHeight: "100%",
+      width: "100%",
+      height: "100%"
+    },
   };
 
   const callbacks: Partial<CallbacksInterface> = {
@@ -67,6 +102,9 @@ export default function VideoCallUIKit() {
 
     return () => {
       document.removeEventListener("trackts", handleTracks);
+      for (const track of localTracks.current) {
+        track.close();
+      }
     };
   }, []);
 
@@ -101,7 +139,7 @@ export default function VideoCallUIKit() {
       </div>
       {videoCall && (
         <div style={{ display: "flex", width: "100%", aspectRatio: 1.5 }}>
-          <AgoraUIKitCustom rtcProps={rtcProps} callbacks={callbacks} />
+          <AgoraUIKitCustom rtcProps={rtcProps} callbacks={callbacks} styleProps={styleProps} />
         </div>
       )}
     </div>
