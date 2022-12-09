@@ -8,19 +8,19 @@ import AgoraRTC, {
   ILocalTrack,
   IMicrophoneAudioTrack,
   NetworkQuality,
-  RemoteStreamFallbackType,
 } from "agora-rtc-sdk-ng";
 import { useEffect, useRef, useState } from "react";
 import AgoraUIKitCustom from "./agoraUIKitCustom";
 import { NetworkQualityComponent } from "./network-quality.component";
-import { useVideoCallContext } from "./video-call.provider";
+import { AgoraAuthInfo } from "./video-call.provider";
 
 AgoraRTC.setLogLevel(4);
 
-export default function VideoCallUIKit() {
-  const { appId, channel, token } = useVideoCallContext();
-
-  const [videoCall, setVideoCall] = useState(true);
+interface Props {
+  agoraAuthInfo: AgoraAuthInfo;
+}
+export default function VideoCallUIKit({ agoraAuthInfo }: Props) {
+  const [videoCall, setVideoCall] = useState(false);
   // network quality
   const [uplinkQuality, setUplinkQuality] = useState(0);
   const [downlinkQuality, setDownlinkQuality] = useState(0);
@@ -30,9 +30,10 @@ export default function VideoCallUIKit() {
 
   const rtcProps: RtcPropsInterface = {
     layout: 1,
-    appId,
-    channel,
-    token,
+    appId: agoraAuthInfo.appId,
+    channel: agoraAuthInfo.channelName,
+    token: agoraAuthInfo.token,
+    uid: agoraAuthInfo.uid,
     disableRtm: true,
     // enableDualStream: true,
     // dualStreamMode: RemoteStreamFallbackType.LOW_STREAM,
@@ -111,6 +112,8 @@ export default function VideoCallUIKit() {
   const handleClickJoin = () => {
     setVideoCall(true);
   };
+
+  if (!agoraAuthInfo) return null;
 
   return (
     <div className="w-full h-full">

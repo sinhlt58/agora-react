@@ -1,14 +1,19 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { getRtmToken } from "./tokens.apis";
 import { VideoCallCustom } from "./video-call-custom";
 // import {} from "agora-rtm-react";
 // import {} from "agora-rtm-sdk";
 import VideoCallUIKit from "./video-call-uikit";
 // import {} from "agora-rtc-react";
 
-interface VideoCallState {
+export interface AgoraAuthInfo {
   appId: string;
-  channel: string;
+  channelName: string;
   token: string;
+  uid: number;
+}
+interface VideoCallState {
+  agoraAuthInfo: AgoraAuthInfo | undefined;
 }
 
 export const VideoCallContext = createContext({} as VideoCallState);
@@ -21,18 +26,28 @@ interface Props {
   children?: React.ReactNode | React.ReactNode[];
 }
 export function VideoCallProvider({ children }: Props) {
-  const appId = "b84167854ccb4b03a50ae63bfe79fee3";
-  const channel = "demo5";
-  const token =
-    "007eJxTYDhTXiWx30B3zoeb8zLOpB5UmKV4IYCl+XZP2qVX0nZTPTcpMCRZmBiamVuYmiQnJ5kkGRgnmhokppoZJ6WlmlumpaYa70mamNwQyMgQUC7NxMgAgSA+K0NKam6+KQMDAKXEICM=";
-
+  const [agoraAuthInfo, setAgoraAuthInfo] = useState<AgoraAuthInfo>();
   const [isUseUIKit, setIsUseUIKit] = useState(true);
 
+  useEffect(() => {
+    const getToken = async () => {
+      const res = await getRtmToken({ uid: Math.floor(Math.random() * 1e9), channelName: "integrate" });
+      const info: AgoraAuthInfo = {
+        ...res.data,
+        // appId: "b84167854ccb4b03a50ae63bfe79fee3",
+        // channel: "demof",
+        // token: "007eJxTYPixwcn0VXNwGW/xr/vlace+7/Ky/PE/ft4xyScux95cX2itwJBkYWJoZm5hapKcnGSSZGCcaGqQmGpmnJSWam6ZlppqnPJmUnJDICPDssWBrIwMEAjiszKkpObmpzEwAACQiSPl",
+      };
+      setAgoraAuthInfo(info);
+    }
+    getToken();
+  }, []);
+
   const value: VideoCallState = {
-    appId,
-    channel,
-    token,
+    agoraAuthInfo,
   };
+
+  if (!agoraAuthInfo) return;
 
   return (
     <VideoCallContext.Provider value={value}>
@@ -52,23 +67,23 @@ export function VideoCallProvider({ children }: Props) {
             <div className="flex flex-col gap-1 mb-4">
               <div className="flex items-center gap-2">
                 <span className="font-bold">App ID: </span>
-                <span>{appId}</span>
+                <span>{agoraAuthInfo.appId}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Channel: </span>
-                <span>{channel}</span>
+                <span>{agoraAuthInfo.channelName}</span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="font-bold">Token: </span>
                 <input
                   className="input-primary flex-1"
-                  value={token}
+                  value={agoraAuthInfo.token}
                   onChange={(_) => { }}
                 />
               </div>
             </div>
-            {isUseUIKit && <VideoCallUIKit />}
-            {!isUseUIKit && <VideoCallCustom />}
+            {isUseUIKit && !!agoraAuthInfo && <VideoCallUIKit agoraAuthInfo={agoraAuthInfo} />}
+            {!isUseUIKit && !!agoraAuthInfo && <VideoCallCustom />}
           </div>
           <div className="grid-cols-0 lg:col-span-2"></div>
         </div>
