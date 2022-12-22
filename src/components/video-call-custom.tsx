@@ -5,7 +5,7 @@ import AgoraRTC, {
   IRemoteAudioTrack,
   IRemoteVideoTrack,
 } from "agora-rtc-sdk-ng";
-import { useVideoCallContext } from "./video-call.provider";
+import { useVideoCallContext, AgoraAuthInfo } from "./video-call.provider";
 import { NetworkQualityComponent } from "./network-quality.component";
 
 interface ChannelParameters {
@@ -19,17 +19,13 @@ interface ChannelParameters {
 }
 
 export const VideoCallCustom = () => {
-  const { appId, channel, token } = useVideoCallContext();
+  const { agoraAuthInfo } = useVideoCallContext();
+  const { appId, channelName, token } = agoraAuthInfo as AgoraAuthInfo;
 
   const options = {
-    // Pass your App ID here.
     appId,
-    // Set the channel name.
-    channel,
-    // Pass your temp token here.
+    channelName,
     token,
-    // Set the user ID.
-    // uid: 0,
   };
 
   const channelParameters = useRef<ChannelParameters>({});
@@ -121,7 +117,7 @@ export const VideoCallCustom = () => {
     // Join a channel.
     const userId = await agoraEngine.current.join(
       options.appId,
-      options.channel,
+      options.channelName,
       options.token
     );
     setLocalUserId(userId.toString());

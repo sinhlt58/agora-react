@@ -12,7 +12,8 @@ import AgoraRTC, {
 import { useEffect, useRef, useState } from "react";
 import AgoraUIKitCustom from "./agoraUIKitCustom";
 import { NetworkQualityComponent } from "./network-quality.component";
-import { AgoraAuthInfo } from "./video-call.provider";
+import { AgoraAuthInfo, useVideoCallContext } from "./video-call.provider";
+import { CallingOverlay } from "./CallingOverlay";
 
 AgoraRTC.setLogLevel(4);
 
@@ -20,7 +21,10 @@ interface Props {
   agoraAuthInfo: AgoraAuthInfo;
 }
 export default function VideoCallUIKit({ agoraAuthInfo }: Props) {
+  const { callingVisibility } = useVideoCallContext();
+
   const [videoCall, setVideoCall] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
   // network quality
   const [uplinkQuality, setUplinkQuality] = useState(0);
   const [downlinkQuality, setDownlinkQuality] = useState(0);
@@ -55,7 +59,7 @@ export default function VideoCallUIKit({ agoraAuthInfo }: Props) {
       width: "fit-content",
       bottom: 0,
       left: "50%",
-      translate: "-50%"
+      translate: "-50%",
     },
     pinnedVideoContainer: {
       position: "relative",
@@ -71,13 +75,19 @@ export default function VideoCallUIKit({ agoraAuthInfo }: Props) {
       minWidth: "100%",
       minHeight: "100%",
       width: "100%",
-      height: "100%"
+      height: "100%",
     },
   };
 
   const callbacks: Partial<CallbacksInterface> = {
+    "connection-state-change": (crrState) => {
+      if (crrState === "CONNECTED") {
+        setIsConnected(true);
+      }
+    },
     EndCall: async () => {
       setVideoCall(false);
+      setIsConnected(false);
       for (const track of localTracks.current) {
         track.close();
       }
@@ -141,8 +151,22 @@ export default function VideoCallUIKit({ agoraAuthInfo }: Props) {
         </div>
       </div>
       {videoCall && (
-        <div style={{ display: "flex", width: "100%", aspectRatio: 1.5 }}>
-          <AgoraUIKitCustom rtcProps={rtcProps} callbacks={callbacks} styleProps={styleProps} />
+        <div
+          style={{
+            display: "flex",
+            width: "100%",
+            aspectRatio: 1.5,
+            position: "relative",
+          }}
+        >
+          <AgoraUIKitCustom
+            rtcProps={rtcProps}
+            callbacks={callbacks}
+            styleProps={styleProps}
+          />
+          {callingVisibility && isConnected && (
+            <CallingOverlay name="Nguyen Van A" callingText="Calling..." />
+          )}
         </div>
       )}
     </div>
