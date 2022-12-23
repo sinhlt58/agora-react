@@ -57,7 +57,7 @@ export function VideoCallProvider({ children }: Props) {
     setCallingVisibility,
   };
 
-  if (!agoraAuthInfo) return;
+  if (!agoraAuthInfo) return null;
 
   return (
     <VideoCallContext.Provider value={value}>
@@ -98,7 +98,7 @@ export function VideoCallProvider({ children }: Props) {
                 <input
                   className="input-primary flex-1"
                   value={agoraAuthInfo.token}
-                  onChange={(_) => {}}
+                  onChange={(_) => { }}
                 />
               </div>
             </div>
